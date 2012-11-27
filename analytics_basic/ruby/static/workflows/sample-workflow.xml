@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workflow-collection xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<workflow name="Checkout" steps="4">
+		<doc url="">
+			Checkout is a common use case for collecting payments for online orders on 
+			eCommerce sites. Typically, these applications have a shopping cart where 
+			the users would select and add products based on their needs, and when they 
+			are ready to make the purchase, they enter into the "Checkout" process to
+			select shipping options, provide payment information, and shipping address.
+			At the end of the checkout process, the application confirms the payments 
+			and kicks off the order fullfillment process.
+		</doc>
+		<step seq-num="1">
+			<doc url="">Setup Payment Details</doc>
+			<request method="POST">
+				<api wadl="https://www.paypal.com/nvp/apis.wadl" methodId="SetExpressCheckout"/>
+				<endpoint>https://api-3t.sandbox.paypal.com/nvp</endpoint>
+				<param name="user" required="true"
+					value="wpp1_1332299192_biz_api1.yahoo.com">
+					<doc url="">User from your API Credentials</doc>
+				</param>
+				<param name="pwd" required="true" value="1332299233">
+					<doc url="">Password from your API Credentials</doc>
+				</param>
+				<param name="signature" required="true"
+					value="ACUe-E7Hjxmeel8FjYAtjnx-yjHAADPhImCUggF7e8AxdhXpYlowDbbw">
+					<doc url="">Signature from your API Credentials</doc>
+				</param>
+				<param name="method" required="true" value="SetExpressCheckout">
+					<doc url="">API Method</doc>
+				</param>
+				<param name="version" required="true" value="92.0">
+					<doc url="">Version of the API</doc>
+				</param>
+				<param name="returnurl" required="true"
+					value="http://developers.x.com/workflow?name=Checkout&amp;status=Success">
+					<doc url="">Url where the user will be redirected back to upon
+						successful payment</doc>
+				</param>
+				<param name="cancelurl" required="true"
+					value="http://developers.x.com/workflow?name=Checkout&amp;status=Cancel">
+					<doc url="">Url where the user will be redirected back to when a
+						payment is canceled by the user</doc>
+				</param>
+				<param name="PAYMENTREQUEST_0_PAYMENTACTION" required="true"
+					value="Sale">
+					<doc url="">Type of payment - Sale for immediate payment.</doc>
+				</param>
+				<param name="PAYMENTREQUEST_0_AMT" required="true" value="1.00">
+					<doc url="">Payment Amount</doc>
+				</param>
+				<param name="PAYMENTREQUEST_0_CURRENCYCODE" required="true"
+					value="USD">
+					<doc url="">Currency Code</doc>
+				</param>
+				<content-type>application/x-www-form-urlencoded; charset=UTF-8</content-type>
+				<code-snippet lang="java"
+					url="https://raw.github.com/gist/1793582/651c264ecaf7e739dd7643e79eeb0ac828dfefd9/gistfile1.aw" />
+				<code-snippet lang="php"
+					url="https://raw.github.com/gist/1793582/651c264ecaf7e739dd7643e79eeb0ac828dfefd9/gistfile1.aw" />
+				<code-snippet lang="curl"><![CDATA[
+			curl https://api-3t.sandbox.paypal.com/nvp \
+				-d method=SetExpressCheckout \
+				-d PAYMENTREQUEST_0_PAYMENTACTION=Sale \
+				-d PAYMENTREQUEST_0_AMT=1.00 \
+				-d PAYMENTREQUEST_0_CURRENCYCODE=USD \
+				-d returnurl=https://developers.x.com/workflow?name=Checkout&status=Success \
+				-d cancelurl=https://developers.x.com/workflow?name=Checkout&status=Cancel \
+				-d version=92.0 \
+				-d user=wpp1_1332299192_biz_api1.yahoo.com \
+				-d pwd=1332299233 \
+				-d signature=ACUe-E7Hjxmeel8FjYAtjnx-yjHAADPhImCUggF7e8AxdhXpYlowDbbw
+		]]>
+				</code-snippet>
+			</request>
+			<response>
+				<assert name="Ack" location="body" operator="CONTAINS"
+					expected-value="Success" />
+				<param-extractor param-name="token" default="-none-"
+					location="body" />
+			</response>
+		</step>
+		<step seq-num="2">
+			<doc url="">Obtain user authorization</doc>
+			<request method="Redirect">
+				<endpoint>https://www.sandbox.paypal.com/cgi-bin/webscr</endpoint>
+				<param name="cmd" required="true" value="_express-checkout">
+					<doc url="">User from your API Credentials</doc>
+				</param>
+				<param name="token" required="true" value="${token}">
+					<doc url="">Token obtained from previous step</doc>
+				</param>
+			</request>
+			<response>
+				<assert name="status" location="query" operator="CONTAINS"
+					expected-value="Success" />
+				<param-extractor param-name="token" default="-none-"
+					location="query" />
+				<param-extractor param-name="PayerID" default="-none-"
+					location="query" />
+			</response>
+		</step>
+		<step seq-num="3" optional="yes">
+			<doc url="">Obtain information about the user (eg. shipping address)</doc>
+			<request method="POST">
+				<api wadl="https://www.paypal.com/nvp/apis.wadl" methodId="GetExpressCheckoutDetails"/>
+				<endpoint>https://api-3t.sandbox.paypal.com/nvp</endpoint>
+				<param name="user" required="true"
+					value="wpp1_1332299192_biz_api1.yahoo.com">
+					<doc url="">User from your API Credentials</doc>
+				</param>
+				<param name="pwd" required="true" value="1332299233">
+					<doc url="">Password from your API Credentials</doc>
+				</param>
+				<param name="signature" required="true"
+					value="ACUe-E7Hjxmeel8FjYAtjnx-yjHAADPhImCUggF7e8AxdhXpYlowDbbw">
+					<doc url="">Signature from your API Credentials</doc>
+				</param>
+				<param name="method" required="true" value="GetExpressCheckoutDetails">
+					<doc url="">API Method</doc>
+				</param>
+				<param name="version" required="true" value="92.0">
+					<doc url="">Version of the API</doc>
+				</param>
+				<param name="token" required="true" value="${token}">
+					<doc url="">Token obtained from the previous step</doc>
+				</param>
+				<content-type>application/x-www-form-urlencoded; charset=UTF-8</content-type>
+				<code-snippet lang="java"
+					url="https://raw.github.com/gist/1793582/651c264ecaf7e739dd7643e79eeb0ac828dfefd9/gistfile1.aw" />
+				<code-snippet lang="php"
+					url="https://raw.github.com/gist/1793582/651c264ecaf7e739dd7643e79eeb0ac828dfefd9/gistfile1.aw" />
+				<code-snippet lang="curl"><![CDATA[
+			curl https://api-3t.sandbox.paypal.com/nvp \
+				-d method=GetExpressCheckoutDetails \
+				-d token=EC-35J25737PX516905U \
+				-d version=92.0 \
+				-d user=wpp1_1332299192_biz_api1.yahoo.com \
+				-d pwd=1332299233 \
+				-d signature=ACUe-E7Hjxmeel8FjYAtjnx-yjHAADPhImCUggF7e8AxdhXpYlowDbbw
+		]]>
+				</code-snippet>
+			</request>
+			<response>
+				<assert name="status" location="body" operator="CONTAINS"
+					expected-value="Success" />
+				<param-extractor param-name="token" default="-none-"
+					location="body" />
+				<param-extractor param-name="PayerID" default="-none-"
+					location="body" />
+			</response>
+		</step>
+		<step seq-num="4">
+			<doc url="">Capture the payment</doc>
+			<request method="POST">
+				<api wadl="https://www.paypal.com/nvp/apis.wadl" methodId="DoExpressCheckoutPayment"/>
+				<endpoint>https://api-3t.sandbox.paypal.com/nvp</endpoint>
+				<param name="user" required="true"
+					value="wpp1_1332299192_biz_api1.yahoo.com">
+					<doc url="">User from your API Credentials</doc>
+				</param>
+				<param name="pwd" required="true" value="1332299233">
+					<doc url="">Password from your API Credentials</doc>
+				</param>
+				<param name="signature" required="true"
+					value="ACUe-E7Hjxmeel8FjYAtjnx-yjHAADPhImCUggF7e8AxdhXpYlowDbbw">
+					<doc url="">Signature from your API Credentials</doc>
+				</param>
+				<param name="method" required="true" value="DoExpressCheckoutPayment">
+					<doc url="">API Method</doc>
+				</param>
+				<param name="version" required="true" value="92.0">
+					<doc url="">Version of the API</doc>
+				</param>
+				<param name="token" required="true" value="${token}">
+					<doc url="">Token obtained from the previous step</doc>
+				</param>
+				<param name="payerid" required="true" value="${token}">
+					<doc url="">PayerID obtained from PayPal</doc>
+				</param>
+				<content-type>application/x-www-form-urlencoded; charset=UTF-8</content-type>
+				<code-snippet lang="java"
+					url="https://raw.github.com/gist/1793582/651c264ecaf7e739dd7643e79eeb0ac828dfefd9/gistfile1.aw" />
+				<code-snippet lang="php"
+					url="https://raw.github.com/gist/1793582/651c264ecaf7e739dd7643e79eeb0ac828dfefd9/gistfile1.aw" />
+				<code-snippet lang="curl"><![CDATA[
+			curl https://api-3t.sandbox.paypal.com/nvp \
+				-d method=DoExpressCheckoutPayment \
+				-d PAYMENTREQUEST_0_PAYMENTACTION=Sale \
+				-d PAYMENTREQUEST_0_AMT=1.00 \
+				-d PAYMENTREQUEST_0_CURRENCYCODE=USD \
+				-d token=EC-35J25737PX516905U \
+				-d payerid=N3SWCAHHS92FU \
+				-d version=92.0 \
+				-d user=wpp1_1332299192_biz_api1.yahoo.com \
+				-d pwd=1332299233 \
+				-d signature=ACUe-E7Hjxmeel8FjYAtjnx-yjHAADPhImCUggF7e8AxdhXpYlowDbbw
+		]]>
+				</code-snippet>
+			</request>
+			<response>
+				<assert name="status" location="body" operator="CONTAINS"
+					expected-value="Success" />
+				<assert name="PaymentStatus" location="body" operator="EQUALS"
+					expected-value="Completed" />
+				<param-extractor param-name="TRANSACTIONID" default="-none-"
+					location="body" />
+				<param-extractor param-name="PayerID" default="-none-"
+					location="body" />
+			</response>
+		</step>
+	</workflow>
+</workflow-collection>

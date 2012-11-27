@@ -1,0 +1,10 @@
+# A sample Gemfile
+source "https://rubygems.org"
+
+gem "sinatra"
+gem 'thin'
+gem 'nokogiri'
+gem 'httparty'
+gem 'json'
+gem 'bigcommerce'
+gem 'haml'

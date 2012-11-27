@@ -1,0 +1,69 @@
+head
+	include bootstrap
+	script(src='/lib/highcharts.js')
+div.navbar.navbar-inverse.navbar-fixed-top
+	div.navbar-inner
+		div.container
+			div.nav-collapse.collapse
+				ul.nav
+div.container
+	h2 Last 10 orders
+	
+	div#chart
+	br
+
+	h2 Customer demographics
+
+	div#demog
+
+
+script(src='./socket.io/socket.io.js')
+script
+	var socket = io.connect("localhost", {port: 3000});
+	
+	socket.on("orders", function(message) { 
+		console.log(message.demographics);
+		chart = new Highcharts.Chart({
+			chart: {
+				renderTo: 'chart',
+				type: 'line',
+				marginRight: 130,
+				marginBottom: 25
+			},
+			title: {
+				text: 'Orders'
+			},
+			xAxis: {
+				categories: JSON.parse(message.dates)
+			},
+			yAxis: {
+				title: {
+					text: 'Sale price'
+				},
+			},
+			series: [{
+				name: 'Signature products',
+				data: (message.amount)
+			}]
+			});
+
+		dchart = new Highcharts.Chart({
+			chart: {
+				renderTo: 'demog'
+			},
+			title: {
+				text: 'Customer demographics'
+			},
+			series: [{
+				type: 'pie',
+				name: 'Where do your customers come from',
+				data: message.demographics
+				
+			}]
+			})
+	});
+
+	
+
+        
+        

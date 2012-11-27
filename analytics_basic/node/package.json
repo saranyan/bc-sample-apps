@@ -1,0 +1,14 @@
+{
+	"name": "bc_analytics_test",
+	"description": "big commerce analytics test app",
+	"version": "0.0.1",
+	"private": true,
+	"dependencies" : {
+		"express": "3.x",
+		"request": "x",
+		"jade": "x",
+		"socket.io": "x",
+		"http": "x",
+		"request": "x"
+	}
+}

@@ -1,0 +1,35 @@
+head
+	include bootstrap
+div.navbar.navbar-inverse.navbar-fixed-top
+	div.navbar-inner
+		div.container
+			div.nav-collapse.collapse
+				ul.nav
+
+div.container
+	h2 
+		| BigCommerce Example App
+	p.lead Get store data
+		span.badge node.js
+		span.badge api v2
+	
+	form#apiform
+		label(for='name') User Name
+		input(id='name', type='text',placeholder='testuser')
+		label(for='key') API key
+		input(id='key', type='text',placeholder='567df000b3e5c0a203f42666531e16ed')
+		label(for='url') Store URL
+		input(id='url', type='text',placeholder='https://store-bwvr466.mybigcommerce.com/api/v2/')
+		br
+		a(id="apisubmit",class="btn") submit
+
+script(type='text/javascript')
+	$('#apisubmit').click(function(){
+		$.ajax('/load',{
+				type: 'POST',
+				data: { name: $('input#name').attr("value"), key: $('input#key').attr("value"), url:$('input#url').attr("value") },
+				success: function(){ console.log("using these keys for the current session");
+														document.location.href = '/dashboard'; },
+				error: function(){ console.log("something broke! cannot update the keys") }
+			});
+		})

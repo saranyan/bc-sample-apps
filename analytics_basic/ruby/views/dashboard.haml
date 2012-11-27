@@ -1,0 +1,71 @@
+%head
+	%title BigCommerce analytics app in ruby
+	%link{:href => 'http://twitter.github.com/bootstrap/assets/css/bootstrap.css', :rel=>'stylesheet'}
+	%link{:href => 'app.css', :rel=> 'stylesheet'}
+	%link{:href => 'style.css', :rel => 'stylesheet'}
+	%script{:src => 'https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js'}
+	%script{:src => 'http://netdna.bootstrapcdn.com/twitter-bootstrap/2.1.0/js/bootstrap.min.js'}
+	%script{:src => 'http://code.highcharts.com/highcharts.js'}
+%div.navbar.navbar-inverse.navbar-fixed-top
+	%div.navbar-inner
+		%div.container
+			%div.nav-collapse.collapse
+				%ul.nav
+%br/
+%br/
+%div.container
+	%h2 Last 10 orders
+	
+	%div#chart
+	%br
+
+	%h2 Customer demographics
+
+	%div#demog
+
+
+:javascript
+	
+		chart = new Highcharts.Chart({
+			chart: {
+				renderTo: 'chart',
+				type: 'line',
+				marginRight: 130,
+				marginBottom: 25
+			},
+			title: {
+				text: 'Orders'
+			},
+			xAxis: {
+				categories: #{@dates}
+			},
+			yAxis: {
+				title: {
+					text: 'Sale price'
+				},
+			},
+			series: [{
+				name: 'Signature products',
+				data: #{@amount}
+			}]
+			});
+
+		dchart = new Highcharts.Chart({
+			chart: {
+				renderTo: 'demog'
+			},
+			title: {
+				text: 'Customer demographics'
+			},
+			series: [{
+				type: 'pie',
+				name: 'Where do your customers come from',
+				data: #{@pie}
+				
+			}]
+			})
+
+	
+
+        
+        
